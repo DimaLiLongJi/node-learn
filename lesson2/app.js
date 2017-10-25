@@ -28,9 +28,9 @@
 var express = require('express');
 var utility = require('utility');
 var app = express();
-app.get('/test1', function(req, res) {
-  var q = req.query.q;
-  var md5 = utility.md5(q);
+app.get('/', function(req, res) {
+  var q = req.query.q; // req.query 是？后面的
+  var md5 = utility.sha1(q);
   res.send(md5);
 })
 app.listen(4000, function(req, res) {
