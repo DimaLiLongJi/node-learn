@@ -61,7 +61,7 @@
     - 在req.on('data')事件中累加请求体
     - req.on('end') 触发后，发送response res.write 写进去
 
-## express.js
+# express.js
 
 - 请求
 
@@ -92,26 +92,62 @@
   2. post
 
     ```
-     const express = require('express');
-     const app = express();
-     const bodayParser = require('body-parser');
-     const urlencodedParser = bodayParser.urlencoded({extended:false}); // 创建 application/x-www-form-urlencoded 编码解析
+    const express = require('express');
+    const app = express();
+    const bodayParser = require('body-parser');
+    const urlencodedParser = bodayParser.urlencoded({extended:false}); // 创建 application/x-www-form-urlencoded 编码解析
 
-     app.use(express.static('pubilc'));
+    app.use(express.static('pubilc'));
 
-     app.post('/post', urlencodedParser, (req, res) => {
-       const data = {
-        first: req.body.first, // req.body 是请求体
-        last: req.body.last,
-       };
-       res.send(JSON.stringify(data))
-     });
+    app.post('/post', urlencodedParser, (req, res) => {
+      const data = {
+       first: req.body.first, // req.body 是请求体
+       last: req.body.last,
+      };
+      res.send(JSON.stringify(data))
+    });
 
-     const service = app.listen(4000, () => {
-       const host = service.address().address;
-       const port = service.address().port;
-     });
+    const service = app.listen(4000, () => {
+      const host = service.address().address;
+      const port = service.address().port;
+    });
     ```
 
 - file
-  
+
+  1. 读取文件
+
+    ```
+    const express = require('express');
+    const app = express();
+    const fs = require('fs');
+    const bodyParser = require('body-parser');
+    const multer = require('multer'); // 用于处理 enctype="multipart/form-data" input file。
+
+    app.use(express.static('public')); // 可以直接通过访问文件
+    app.use(bodayParser.urlencoded({}));
+    app.use(multer({dest: '/tmp/'}).array('image')); // 仅仅设置可以访问的路径下的文件
+
+    app.post('/fileUpload', (req, res) => {
+      let file = req.files[0]; // 文件信息
+      let des_file = `${__dirname}/${file.originalname}`; // 文件存入的地址
+      fs.readFile(file.path, (err, data) => { // 读取文件 fs.readFile(文件地址，(err, data) => {})
+       fs.writeFile(des_file, data, (err) => { // 写入文件 fs.writeFile(存入地址, data, (err) => {});
+         if (err) {
+           console.log(err);
+         } else {
+           let response = {
+               message:'File uploaded successfully',
+               filename: file.originalname,
+           };
+         }
+         res.end(JSON.stringify(response));
+       })
+      })
+    });
+
+    const service = app.listen(4000, () => {
+      const host = server.address().address;
+      const port = server.address().port;
+    });
+    ```

@@ -21,7 +21,7 @@ app.post('/fileUpload', (req, res) =>{
       if (err) {
         console.log(err);
       } else {
-        response = {
+        const response = {
           message:'File uploaded successfully',
           filename:file.originalname,
         };
